@@ -170,9 +170,9 @@ class Extractor(BaseExtractor):
                     myunit=unit
                     weight = float(weight.strip().rstrip(unit).strip())
                     if (myunit in ['lb', 'lb.', 'lbs', 'pound', 'pounds']):
-                        return math.round(weight * 10)
+                        return round(weight * 10)
                     elif (myunit in ['oz', 'oz.', 'ounce', 'ounces']):
-                        wt = math.round(weight/16.0 *10)
+                        wt = round(weight/16.0 *10)
                         if (wt==0): wt=1
                         return wt
                 except:
