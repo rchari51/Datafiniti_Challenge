@@ -146,9 +146,9 @@ Extension of this application to other sites is also not easy, since for full fu
 4. **Outputs in other than JSON format**: Extract.extract() returns a dictionary of key-value pairs which can be dumped in json format or any key-value store, such as Redis.
 
 ## References
-. [1] [Bin-packing, First-Fit Algorithm, Wikipedia](https://en.wikipedia.org/wiki/Bin_packing_problem#First-fit_algorithm)
-. [2] [Bin Packing Problem](https://www.geeksforgeeks.org/bin-packing-problem-minimize-number-of-used-bins/)
-. [3] [Datefinder package](https://pypi.org/project/datefinder/)
-. [4] [Beautiful Soup (bs4) package](https://pypi.org/project/beautifulsoup4/)
-. [5] [Binpacking package](https://pypi.org/project/binpacking/)
+#### [1] [Bin-packing, First-Fit Algorithm, Wikipedia](https://en.wikipedia.org/wiki/Bin_packing_problem#First-fit_algorithm)
+#### [2] [Bin Packing Problem](https://www.geeksforgeeks.org/bin-packing-problem-minimize-number-of-used-bins/)
+#### [3] [Datefinder package](https://pypi.org/project/datefinder/)
+#### [4] [Beautiful Soup (bs4) package](https://pypi.org/project/beautifulsoup4/)
+#### [5] [Binpacking package](https://pypi.org/project/binpacking/)
 
