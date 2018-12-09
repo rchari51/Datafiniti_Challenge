@@ -1,9 +1,11 @@
 # Data Challenge Response
-This project is in response to the Data Challenge from Datafiniti. Its goal is to write an application to extract as much information as possible about a book from a sample Amazon bookpage. While there may be many similarities in formatting between a sample bookpage and today's version of it on Amazon, there will be differences due to which the information extracted will be less if the application is tried on today's webpages.
+This project is in response to the Data Challenge from Datafiniti. Its goal is 1) to write an application to extract as much information as possible about a book from a given sample of Amazon book pages, and 2) to automate the process of packing a given set of books into fixed sized boxes, i.e., to solve a bin-packing problem. The two problems are very different: the second one is well-understood and there are multiple open-source solutions available for it. We therefore focus on the first. 
 
-This folder contains the application **package.py** and the ancillary file **bookpage.py**.
+While there may be many similarities in formatting between a sample bookpage and today's version of it on Amazon, there may also be differences due to which this application may not be as  successful. In this document I iwll briefly touch on some extensions that can be made to the application to make it more generally applicable, powerful and useful.
+
+This folder contains this file, the application **package.py** and the ancillary file **bookpage.py**.
 **bookpage.py** contains the class *Extractor* and its base class *BaseExtractor*  .
-**package.py** is a driver which uses the information, and in particular, book weights extracted by Extractor.extract() from 20 given html files and solves a bin-packing problem (using a binpacking library) to pack those books into the smallest number of bins such that none of them holds more than 10 lbs. This greedy "first-fit" algorithm [1][2] is guaranteed to find a solution if it exists but may be suboptimal, the problem being NP-hard.
+**package.py** is a driver which uses the information, and in particular, book weights extracted by Extractor.extract() from the 20 given html files and solves a bin-packing problem (using a binpacking library) to pack those books into the smallest number of bins such that none of them holds more than 10 lbs. This greedy "first-fit" algorithm [1][2] is guaranteed to find a solution if it exists but may be suboptimal, the problem being NP-hard.
 
 ## Dependencies
 **bookpage.py** requires, besides the built-ins *codecs*, *json* and *datetime* the packages *datefinder* [3] and *bs4* [4] which contains *BeautifulSoup*. **package.py** requires *binpacking"[5], a library for, well, binpacking. You can install bs4, datefinder and binpacking using pip or conda, thus:
@@ -31,14 +33,14 @@ and follow the prompts to supply the data directory, the capacity of each box an
 The outout will be written to stdout if '-' is supplied as the output file path.
 
 ## Information Extracted from Amazon pages
-The extract() method in Extractor extracts information about many more fields than are suggested in the README.md file attached to the dataset. The list extracted is open-ended and depends on the information available in the book page. The function exploits the machine-readable but unrendered meta data in the sample files, specifically the tags:
+The extract() method in Extractor extracts information about many more fields than are suggested in the README.md file attached to the dataset. The list of fields extracted is open-ended and depends on the information available in the book page. The function exploits the machine-readable but unrendered meta data in the sample files, specifically the tags:
 ```sh
 <meta name="title" content="<title>: [<subtitle>:] <author>: <ISBN-13>: <seller>: <product_category>"/>
 <meta name="keywords" content = "<author>,<title>,[<subtitle>,]<publisher>,<ISBN-10>,<tag1>,<tag2>,...<tagn>"/>
 ```
-where fields in angled brackets are to be replaced by values. Keywords may or may not be present in an Amazon webpage, but it is there in each element of the dataset, and since that is the object of analysis, we used them.
+where fields in angled brackets are to be replaced by values. The meta tag named "keywords" may or may not be present in an Amazon webpage, but it is there in each element of the dataset, and since that is the object of analysis, we used them.
 
-Deeper processing of the <publisher> field sometimes yields edition and publication date information as well, while the rating in terms of number of stars and the number of customer reviews are extracted from a field with name containing 'Review'. The 
+The <publisher> field sometimes contains edition and publication date information as well, while the rating in terms of number of stars and the number of customer reviews are contained in a field with name which includes 'Review'. This application goes to great lengths to extract publisher, edition, publication date, star rating and number of reviews wherever possible. 
 
 In addition to the abovementioned tags, three tables embedded in the html were sources of information, namely :
 ```sh
@@ -48,9 +50,14 @@ In addition to the abovementioned tags, three tables embedded in the html were s
 ```
 Only one of (2) and (3) may be present. These have price information: list price and actual price in (2) and "buy new" price and "rent" price in (3). The former is applicable to "regular" books while the latter applies mainly to textbooks which can be sold back to Amazon and rented.
 ## Assumptions
-In order to extract information from the sample Amazon webpages, we looked at the structure of the html sources with the desired information in mind. We encoded our observations about how to get the most information from webpages in this format. Thus we found that title metadata contained title, author, ISBN-13, seller (Amazon.com), product_category(in this case Books). When a subtitle was present, it was inserted right after Title. Similarly, the keyword metadata is a string containing author, title, optional subtitle, publisher, ISBN-10. This is followed by a variable number of "Tags" which is cataloging/classification data which can be used for fetching books of a certain genre or subject matter. The information in the product details table is in the general format 'key':'value' where 'value' may have a rich structure and more than one interesting value. An attempt has been made to extract such things as the publication date' and the edition. We totally ignore everything including and following the 'Rank' fields.
+In order to extract information from the sample Amazon webpages, we looked at the structure of the html sources and the information embedded within the noise therein. We found two meta tags in each file contaning important machine-readable data. The sequence of data in the meta tag with name="title" could be interpreted as title, author, ISBN-13, seller(?) (Amazon.com) and product_category(in this case 'Books'). When a subtitle was present, it was inserted right after Title. Similarly, the meta tag with name="keywords" has a string containing author, title, optional subtitle, publisher, ISBN-10. This is followed by a variable number of what I call "Tags" which is cataloging/classification data which can be used for fetching books of a certain genre or subject matter. All other meta tags are irrelevant for our purposes.
 
-Prices are retrieved from the the two price tables, only one of which may logivally exist in a web page. One of the price tables gives the 'List Price' and the 'Price'. When there is no discount, there may only be a 'Price' field. We ignore fields such as 'Deal Price'. The other price table format is used mainly for textbooks which may be sold back to Amazon and rented from it or bought new. The 'New' price as well as the 'Rent' price are extracted.
+A product details table one of two kinds of "price tables" are found in each sample webpage. The information in the product details table is in the general format 'key':'value' where 'value' may have a rich structure and more than one interesting value. An attempt has been made to extract such things as the publication date' and the edition. We totally ignore everything including and following the 'Rank' fields.
+
+Prices are retrieved from the the two price tables, only one of which may logically exist in a web page. One of the price tables gives the 'List Price' and the 'Price'. When there is no discount, there may only be a 'Price' field. We ignore fields such as 'Deal Price'. The other price table format is used mainly for textbooks which may be sold back to Amazon and rented from it or bought new. The 'New' price as well as the 'Rent' price are extracted.
+
+Note that in web pages for non-book items such as electronic goods or apparel on Amazon, the abovementioned meta tags may not make sense and may not be (both) present, or , when present, may not have the same syntax and semantics. When the product details table is present in such cases, the keys may be very different. Not only that, the table structure in html may be different. All these pose problems for generalization. The situation gets worse as we proceed to e-commerce pages from, say bnb.com or target.com.
+
 ## Extensions
 1. **Other Amazon Pages**: It should be clear that extract() depends on many assumptions about the structure of the input html. These assumptions are true for the sample dataset and seem to be largely obeyed on current Amazon pages for books. For example for the book 'Zen Flesh, Zen Bones', we get:
 ```sh
@@ -143,7 +150,7 @@ Extension of this application to other sites is also not easy, since for full fu
         </tr>
 </table>
 ```
-4. **Outputs in other than JSON format**: Extract.extract() returns a dictionary of key-value pairs which can be dumped in json format or any key-value store, such as Redis.
+4. **Outputs in formats other than JSON:** Extract.extract() returns a dictionary of key-value pairs which can be dumped in json format or any key-value store, such as Redis.
 
 ## References
 #### [1] [Bin-packing, First-Fit Algorithm, Wikipedia](https://en.wikipedia.org/wiki/Bin_packing_problem#First-fit_algorithm)
