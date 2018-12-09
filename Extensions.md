@@ -115,15 +115,18 @@ Prices are retrieved from the the two price tables, only one of which may logiva
 ```
 
 but similar good behavior is not seen in the case of, say "Eye and Brain: The Psychology of Seeing". This has to do with the latter html's non-conformity with the template. Compare:
+```sh
 "Eye and Brain: The Psychology of Seeing - Fifth Edition (Princeton Science Library): 9780691165165: Medicine & Health Science Books @ Amazon.com"
+```
 with:
+```sh
 "Coding the Matrix: Linear Algebra through Applications to Computer Science: Philip N. Klein: 9780615880990: Amazon.com: Books".
+```
 The second one complies with the template:
 ['Title', 'Subtitle', 'Author', 'ISBN-13', 'Seller', 'Product_Category']
 whereas the first one does not. I do not have an immediate idea for a generalization that will accommodate all the ad-hoc formats these strings can come in, but see below under **Intelligent Extraction**. **However, for extension to products other than books, the semantics of the meta strings will have to be specified per product type.** 
 
-    Extension of this application to other sites is also not easy, since for full functionality it needs at least meta information strings to be present with a certain syntax and semantics which is product-specific and also a product details table. More investigation and study of Web 2.0 "standards" may allow us to come up with better generalizations.
-
+Extension of this application to other sites is also not easy, since for full functionality it needs at least meta information strings to be present with a certain syntax and semantics which is product-specific and also a product details table. The solution would be some kind of seq2seq model which is trained on a variety of (meta string, field-names) pairs. More investigation and study of Web 2.0 "standards" is obviously necessary.
 2. **Efficient bin-packing:** I have not made any attempt towards very efficient bin packing that will scale to millions of items. But research is still on for more efficient and scalable algorithms and heuristics for basic bin-packing as well as variants (multi-capacity, etc.) variants thereof. 
 3. **Intelligent Extraction:** This application is aware of the two <meta/> tags and 3 <table>s to look for. What if we did not have any such pointers? I suggest that we can always look for <meta/> tags since they are for carrying machine-readable as opposed to rendered content and are present in most modern e-commerce webpages. Each of these gives us a string which can be split by means of a separator which should be clear from the string. It is the semantics of these substrings that is the question. In order to interpret what these substrings mean, I suggest that we first create a large corpus by collecting together from each page on this website (to reduce variation) all the abovementioned substrings as well as all clean, readable text/content of <li> tags inside <ul> lists or <td> tags inside rows <tr>. Assuming that this collection of text from eah page of this huge website is large enough, we can get an embedding for each word/phrase by using pre-trained word2vec or fastText. We can then find the "value-attribute" relation by using for each substring of a meta-data string the analogy:
 ```sh
