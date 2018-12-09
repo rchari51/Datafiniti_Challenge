@@ -21,9 +21,9 @@ $pip install binpacking
 >> html = codecs.open(bookpage, 'r', encoding='utf-8', errors='ignore')
 >> extractor = Extractor(html)
 >> jdict = extractor.extract() 
->> print(json.dumps(jdict))
+>> print(json.dumps(jdict), indent=4)
 ```
-2. To create a packing "schedule" for a set of books to be packed into boxes with a capacity of C lbs, do
+2. To create a packing "schedule" for a set of books all in a single direcory to be packed into boxes with a capacity of C lbs, do
 ```sh
 $ python package.py 
 ```
@@ -53,6 +53,7 @@ In order to extract information from the sample Amazon webpages, we looked at th
 Prices are retrieved from the the two price tables, only one of which may logivally exist in a web page. One of the price tables gives the 'List Price' and the 'Price'. When there is no discount, there may only be a 'Price' field. We ignore fields such as 'Deal Price'. The other price table format is used mainly for textbooks which may be sold back to Amazon and rented from it or bought new. The 'New' price as well as the 'Rent' price are extracted.
 ## Extensions
 1. **Other Amazon Pages**: It should be clear that extract() depends on many assumptions about the structure of the input html. These assumptions are true for the sample dataset and seem to be largely obeyed on current Amazon pages for books. For example for the book 'Zen Flesh, Zen Bones', we get:
+```sh
 {
     "Title": " Nyogen Senzaki",
     "Author": "Paul Reps",
@@ -111,6 +112,8 @@ Prices are retrieved from the the two price tables, only one of which may logiva
     "Shipping Weight": "1.2 pounds",
     "weight": 0
 }
+```
+
 but similar good behavior is not seen in the case of, say "Eye and Brain: The Psychology of Seeing". This has to do with the latter html's non-conformity with the template. Compare:
 "Eye and Brain: The Psychology of Seeing - Fifth Edition (Princeton Science Library): 9780691165165: Medicine & Health Science Books @ Amazon.com"
 with:
