@@ -1,36 +1,5 @@
-# Data Challenge Response
-This project is in response to the Data Challenge from Datafiniti. Its goal is 1) to write an application to extract as much information as possible about a book from a given sample of Amazon book pages, and 2) to automate the process of packing a given set of books into fixed sized boxes, i.e., to solve a bin-packing problem. The two problems are very different: the second one is well-understood and there are multiple open-source solutions available for it. We therefore focus on the first. 
 
 While there may be many similarities in formatting between a sample bookpage and today's version of it on Amazon, there may also be differences due to which this application may not be as  successful. In this document I will briefly touch on some extensions that can be made to the application to make it more generally applicable, powerful and useful.
-
-This folder contains this file, the application **package.py** and the ancillary file **bookpage.py**.
-**bookpage.py** contains the class *Extractor* and its base class *BaseExtractor*  .
-**package.py** is a driver which uses the information, and in particular, book weights extracted by Extractor.extract() from the 20 given html files and solves a bin-packing problem (using a binpacking library) to pack those books into the smallest number of bins such that none of them holds more than 10 lbs. This greedy "first-fit" algorithm [1][2] is guaranteed to find a solution if it exists but may be suboptimal, the problem being NP-hard.
-
-## Dependencies
-**bookpage.py** requires, besides the built-ins *codecs*, *json* and *datetime* the packages *datefinder* [3] and *bs4* [4] which contains *BeautifulSoup*. **package.py** requires *binpacking"[5], a library for, well, binpacking. You can install bs4, datefinder and binpacking using pip or conda, thus:
-```sh
-$pip install bs4
-$pip install datefinder
-$pip install binpacking
-```
-## Running the Application
-1. To extract information from an Amazon book webpage formatted similarly to the sample of 20 files in the data directory, open a python 3.6 shell and type:
-```sh
->> from bookpage import Extractor
->> import codecs, json
->> bookpage = '/path/to/html/file'
->> html = codecs.open(bookpage, 'r', encoding='utf-8', errors='ignore')
->> extractor = Extractor(html)
->> jdict = extractor.extract() 
->> print(json.dumps(jdict), indent=4)
-```
-2. To create a packing "schedule" for a set of books all in a single direcory to be packed into boxes with a capacity of C lbs, do
-```sh
-$ python package.py 
-```
-and follow the prompts to supply the data directory, the capacity of each box and the output file path. All the html files in the data directory will be processed.
-The outout will be written to stdout if '-' is supplied as the output file path.
 
 ## Information Extracted from Amazon pages
 The extract() method in Extractor extracts information about many more fields than are suggested in the README.md file attached to the dataset. The list of fields extracted is open-ended and depends on the information available in the book page. The function exploits the machine-readable but unrendered meta data in the sample files, specifically the tags:
@@ -49,6 +18,7 @@ In addition to the abovementioned tags, three tables embedded in the html were s
 <table id="rentalPriceBlockGrid">         .......(3)
 ```
 Only one of (2) and (3) may be present. These have price information: list price and actual price in (2) and "buy new" price and "rent" price in (3). The former is applicable to "regular" books while the latter applies mainly to textbooks which can be sold back to Amazon and rented.
+
 ## Assumptions
 In order to extract information from the sample Amazon webpages, we looked at the structure of the html sources and the information embedded within the noise therein. We found two meta tags in each file contaning important machine-readable data. The sequence of data in the meta tag with name="title" could be interpreted as title, author, ISBN-13, seller(?) (Amazon.com) and product_category(in this case 'Books'). When a subtitle was present, it was inserted right after Title. Similarly, the meta tag with name="keywords" has a string containing author, title, optional subtitle, publisher, ISBN-10. This is followed by a variable number of what I call "Tags" which is cataloging/classification data which can be used for fetching books of a certain genre or subject matter. All other meta tags are irrelevant for our purposes.
 
