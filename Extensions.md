@@ -2,7 +2,8 @@
 While there may be many similarities in formatting between a sample bookpage and today's version of it on Amazon, there may also be differences due to which this application may not be as  successful. In this document I will briefly touch on some extensions that can be made to the application to make it more generally applicable, powerful and useful.
 
 ## Information Extracted from Amazon pages
-The extract() method in Extractor extracts information about many more fields than are suggested in the README.md file attached to the dataset. The list of fields extracted is open-ended and depends on the information available in the book page. The function exploits the machine-readable but unrendered meta data in the sample files, specifically the tags:
+Referring to the instructions to run the application, we first create an Extractor instance initiaized with the html source of the webpage. We can then call the extract() method on this object to get the information on the book described on the page,
+This method extracts information about many more fields than are suggested in the README.md file attached to the dataset. The list of fields extracted is open-ended and depends on the information available in the book page. The function exploits the machine-readable but unrendered meta data in the sample files, specifically the tags:
 ```sh
 <meta name="title" content="<title>: [<subtitle>:] <author>: <ISBN-13>: <seller>: <product_category>"/>
 <meta name="keywords" content = "<author>,<title>,[<subtitle>,]<publisher>,<ISBN-10>,<tag1>,<tag2>,...<tagn>"/>
